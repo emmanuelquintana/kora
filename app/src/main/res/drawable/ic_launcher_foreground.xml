@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Ícono de Kora: una hoja de calendario de taco (encuadernado en tinta,
+    perforación y la K en petróleo). Todo dentro de la zona segura de 66dp.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Hoja -->
+    <path
+        android:fillColor="#FBFAF7"
+        android:pathData="M37,30 H71 A5,5 0 0 1 76,35 V77 A5,5 0 0 1 71,82 H37 A5,5 0 0 1 32,77 V35 A5,5 0 0 1 37,30 Z" />
+
+    <!-- Encuadernado -->
+    <path
+        android:fillColor="#1A1C1B"
+        android:pathData="M37,30 H71 A5,5 0 0 1 76,35 V40 H32 V35 A5,5 0 0 1 37,30 Z" />
+
+    <!-- Perforación -->
+    <path
+        android:fillColor="#0E6B6B"
+        android:pathData="M37.5,40 a1.6,1.6 0 1 0 3.2,0 a1.6,1.6 0 1 0 -3.2,0 Z M45.5,40 a1.6,1.6 0 1 0 3.2,0 a1.6,1.6 0 1 0 -3.2,0 Z M53.5,40 a1.6,1.6 0 1 0 3.2,0 a1.6,1.6 0 1 0 -3.2,0 Z M61.5,40 a1.6,1.6 0 1 0 3.2,0 a1.6,1.6 0 1 0 -3.2,0 Z M69.5,40 a1.6,1.6 0 1 0 3.2,0 a1.6,1.6 0 1 0 -3.2,0 Z" />
+
+    <!-- K -->
+    <path
+        android:fillColor="#0E6B6B"
+        android:pathData="M43,49 H49.5 V74 H43 Z M49.5,60.5 L59,49 H66.5 L53.5,64 Z M52.5,61 L66.5,74 H58.5 L49.5,65.5 Z" />
+</vector>

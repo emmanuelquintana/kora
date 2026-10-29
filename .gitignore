@@ -1,0 +1,37 @@
+# Gradle / build
+.gradle/
+build/
+**/build/
+.kotlin/
+local.properties
+captures/
+*.apk
+*.aab
+*.ap_
+*.dex
+dist/
+
+# Secretos: NUNCA al repositorio
+app/google-services.json
+*.jks
+*.keystore
+*.p12
+*.pem
+keystore.properties
+*.b64
+
+# IDEs y editores
+.idea/
+*.iml
+.vscode/
+.fleet/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Herramientas de diseño (salidas locales)
+.taste-skill/
+.impeccable/review/
+.impeccable/mocks/
+.impeccable/build/
+.impeccable/config.local.json

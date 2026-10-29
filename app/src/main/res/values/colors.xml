@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Solo colores que necesita el sistema antes de que Compose dibuje
+    (ventana, splash, ícono). La paleta completa vive en
+    core/designsystem/KoraTones.kt; mantenlos sincronizados.
+-->
+<resources>
+    <color name="kora_paper">#FFFBFAF7</color>
+    <color name="kora_paper_night">#FF121514</color>
+    <color name="kora_icon_background">#FF0E6B6B</color>
+</resources>

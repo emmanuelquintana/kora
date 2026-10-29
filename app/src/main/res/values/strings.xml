@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Kora</string>
+    <string name="app_tagline">Claridad para cuidar lo importante</string>
+
+    <string name="demo_mode_title">Modo demostración</string>
+    <string name="demo_mode_body">Firebase no está configurado en este build. Los datos que verás serán ficticios y nada se sincroniza.</string>
+    <string name="connected_mode_title">Firebase configurado</string>
+    <string name="connected_mode_body">Este build puede iniciar sesión y sincronizar con Cloud Firestore.</string>
+
+    <string name="bootstrap_heading">Base lista</string>
+    <string name="bootstrap_body">Esta es la versión inicial de Kora: tema, tipografía y canal de compilación. Los registros, gráficas y recordatorios llegan en las siguientes entregas.</string>
+
+    <string name="build_section_title">Este build</string>
+    <string name="build_version">Versión</string>
+    <string name="build_commit">Commit</string>
+    <string name="build_signing">Firma</string>
+    <string name="build_window">Ventana</string>
+    <string name="build_posture">Postura</string>
+
+    <string name="signing_persistent">Persistente · admite actualizaciones</string>
+    <string name="signing_ephemeral">Temporal · solo para pruebas</string>
+    <string name="signing_unsigned">Sin firma (build local)</string>
+    <string name="signing_ephemeral_warning">Este APK usa una firma temporal. Para instalar otro build tendrás que desinstalarlo primero y se borrarán sus datos locales.</string>
+
+    <string name="window_compact">Compacta (pantalla exterior)</string>
+    <string name="window_medium">Mediana</string>
+    <string name="window_expanded">Expandida (pantalla interior)</string>
+    <string name="posture_tabletop">Semiabierto, bisagra horizontal (Flex)</string>
+    <string name="posture_book">Semiabierto, bisagra vertical</string>
+    <string name="posture_flat">Plana</string>
+
+    <string name="today_content_description">Hoy es %1$s</string>
+</resources>

@@ -1,0 +1,277 @@
+name: Build and release
+
+# A. Push a main / ejecución manual → compila, valida y publica un APK de prueba
+#    como GitHub Actions Artifact (sin Release).
+# B. Tag vX.Y.Z → compila, firma con el keystore persistente (obligatorio),
+#    verifica la firma y publica un GitHub Release con APK + SHA-256.
+on:
+  push:
+    branches: [main]
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+# Permisos mínimos por defecto; solo el job "release" pide contents: write.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+env:
+  ANDROID_BUILD_TOOLS: '34.0.0'
+  ANDROID_PLATFORM: 'android-35'
+
+jobs:
+  build:
+    name: Compilar y validar
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      apk_name: ${{ steps.package.outputs.apk_name }}
+      signing_kind: ${{ steps.signing.outputs.kind }}
+      cert_sha256: ${{ steps.verify.outputs.cert_sha256 }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK (platform 35 + build-tools)
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" --install "platforms;${ANDROID_PLATFORM}" "build-tools;${ANDROID_BUILD_TOOLS}" "platform-tools" > /dev/null
+          echo "$ANDROID_HOME/build-tools/${ANDROID_BUILD_TOOLS}" >> "$GITHUB_PATH"
+
+      - name: Gradle 8.9 (sin wrapper)
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Calcular versión
+        id: version
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+            if ! [[ "$VERSION" =~ ^[0-9]{1,3}\.[0-9]{1,2}\.[0-9]{1,2}$ ]]; then
+              echo "::error::El tag '$GITHUB_REF_NAME' no tiene formato vX.Y.Z (MAJOR≤999, MINOR/PATCH≤99)."
+              exit 1
+            fi
+          else
+            BASE="$(grep -E '^versionName=' version.properties | cut -d= -f2 | tr -d '[:space:]')"
+            VERSION="${BASE}-dev.${GITHUB_RUN_NUMBER}"
+          fi
+          echo "KORA_VERSION_NAME=$VERSION" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Versión: $VERSION"
+
+      - name: Configuración de Firebase (opcional)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${GOOGLE_SERVICES_JSON:-}" ]]; then
+            echo "::notice::GOOGLE_SERVICES_JSON no está configurado: el APK funcionará en Modo demostración (sin Firebase)."
+            exit 0
+          fi
+          # Acepta el JSON tal cual o codificado en Base64.
+          if printf '%s' "$GOOGLE_SERVICES_JSON" | jq -e . > /dev/null 2>&1; then
+            printf '%s' "$GOOGLE_SERVICES_JSON" > app/google-services.json
+          else
+            printf '%s' "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
+          fi
+          if ! jq -e '.client[].client_info.android_client_info.package_name | select(. == "com.emmanuelquintana.kora")' app/google-services.json > /dev/null; then
+            echo "::error::google-services.json no contiene un cliente Android para com.emmanuelquintana.kora."
+            rm -f app/google-services.json
+            exit 1
+          fi
+          echo "Firebase configurado."
+
+      - name: Preparar firma
+        id: signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          KEYSTORE_FILE="$RUNNER_TEMP/kora-signing.jks"
+          if [[ -n "${KEYSTORE_BASE64:-}" && -n "${KEYSTORE_PASSWORD:-}" && -n "${KEY_ALIAS:-}" && -n "${KEY_PASSWORD:-}" ]]; then
+            printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_FILE"
+            KIND=persistent
+            {
+              echo "KORA_KEYSTORE_FILE=$KEYSTORE_FILE"
+              echo "KORA_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
+              echo "KORA_KEY_ALIAS=$KEY_ALIAS"
+              echo "KORA_KEY_PASSWORD=$KEY_PASSWORD"
+            } >> "$GITHUB_ENV"
+          elif [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "::error::Un Release oficial exige el keystore persistente. Configura KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS y KEY_PASSWORD en GitHub Secrets (ver README § Firma)."
+            exit 1
+          else
+            # Firma temporal: válida solo para instalar ESTE APK de prueba.
+            # Cambia en cada ejecución: no permite actualizar una instalación previa.
+            EPHEMERAL_PASSWORD="$(openssl rand -hex 24)"
+            echo "::add-mask::$EPHEMERAL_PASSWORD"
+            keytool -genkeypair -noprompt \
+              -keystore "$KEYSTORE_FILE" -storetype PKCS12 \
+              -alias kora-ephemeral -keyalg RSA -keysize 3072 -validity 30 \
+              -dname "CN=Kora build de prueba (firma temporal), O=Kora" \
+              -storepass "$EPHEMERAL_PASSWORD" -keypass "$EPHEMERAL_PASSWORD" > /dev/null
+            KIND=ephemeral
+            {
+              echo "KORA_KEYSTORE_FILE=$KEYSTORE_FILE"
+              echo "KORA_KEYSTORE_PASSWORD=$EPHEMERAL_PASSWORD"
+              echo "KORA_KEY_ALIAS=kora-ephemeral"
+              echo "KORA_KEY_PASSWORD=$EPHEMERAL_PASSWORD"
+            } >> "$GITHUB_ENV"
+            echo "::warning::Sin keystore en Secrets: este APK usa una firma TEMPORAL. Sirve para probar, pero no podrá actualizarse con builds posteriores sin desinstalar."
+          fi
+          echo "KORA_SIGNING_KIND=$KIND" >> "$GITHUB_ENV"
+          echo "kind=$KIND" >> "$GITHUB_OUTPUT"
+
+      - name: Pruebas unitarias, lint y APK release
+        run: gradle testReleaseUnitTest lintRelease assembleRelease --stacktrace
+
+      - name: Verificar firma del APK
+        id: verify
+        env:
+          EXPECTED_CERT_SHA256: ${{ vars.KORA_CERT_SHA256 }}
+        run: |
+          set -euo pipefail
+          APK="$(find app/build/outputs/apk/release -name '*.apk' ! -name '*unsigned*' | head -n1)"
+          if [[ -z "$APK" ]]; then
+            echo "::error::No se generó un APK firmado."
+            exit 1
+          fi
+          apksigner verify --verbose --print-certs "$APK" > "$RUNNER_TEMP/apksigner.txt"
+          grep -E '^Verified using v[23] scheme' "$RUNNER_TEMP/apksigner.txt" || true
+          CERT="$(grep -m1 'certificate SHA-256 digest' "$RUNNER_TEMP/apksigner.txt" | awk -F': ' '{print $2}' | tr -d ':' | tr '[:upper:]' '[:lower:]')"
+          echo "Certificado SHA-256: $CERT"
+          if [[ "${KORA_SIGNING_KIND}" == "persistent" && -n "${EXPECTED_CERT_SHA256:-}" ]]; then
+            EXPECTED="$(printf '%s' "$EXPECTED_CERT_SHA256" | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
+            if [[ "$CERT" != "$EXPECTED" ]]; then
+              echo "::error::El certificado de firma no coincide con KORA_CERT_SHA256. Las actualizaciones fallarían en los dispositivos instalados."
+              exit 1
+            fi
+            echo "La firma coincide con la identidad registrada."
+          fi
+          echo "cert_sha256=$CERT" >> "$GITHUB_OUTPUT"
+          echo "APK_PATH=$APK" >> "$GITHUB_ENV"
+
+      - name: Nombrar APK y checksum
+        id: package
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          VERSION="${{ steps.version.outputs.version }}"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            NAME="Kora-v${VERSION}.apk"
+          elif [[ "$KORA_SIGNING_KIND" == "ephemeral" ]]; then
+            NAME="Kora-v${VERSION}-PRUEBA-firma-temporal.apk"
+          else
+            NAME="Kora-v${VERSION}-prueba.apk"
+          fi
+          cp "$APK_PATH" "dist/$NAME"
+          (cd dist && sha256sum "$NAME" > "$NAME.sha256")
+          cat "dist/$NAME.sha256"
+          echo "apk_name=$NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Subir APK como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kora-${{ steps.version.outputs.version }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Subir reportes (lint y pruebas)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-${{ github.run_number }}
+          path: |
+            app/build/reports/
+            app/build/test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Resumen
+        if: success()
+        run: |
+          {
+            echo "### Kora ${{ steps.version.outputs.version }}"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| APK | \`${{ steps.package.outputs.apk_name }}\` |"
+            echo "| Firma | ${{ steps.signing.outputs.kind }} |"
+            echo "| Certificado SHA-256 | \`${{ steps.verify.outputs.cert_sha256 }}\` |"
+            if [[ -f app/google-services.json ]]; then echo "| Firebase | configurado |"; else echo "| Firebase | no configurado (Modo demostración) |"; fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [[ "${{ steps.signing.outputs.kind }}" == "ephemeral" ]]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "> ⚠️ Firma temporal: instala este APK solo para pruebas. Para actualizar sobre él tendrás que desinstalarlo (se pierden los datos locales)." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Limpiar material sensible
+        if: always()
+        run: rm -f "$RUNNER_TEMP/kora-signing.jks" app/google-services.json
+
+  release:
+    name: Publicar GitHub Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Descargar APK
+        uses: actions/download-artifact@v4
+        with:
+          name: kora-${{ needs.build.outputs.version }}
+          path: dist
+
+      - name: Notas de versión
+        run: |
+          set -euo pipefail
+          NAME="${{ needs.build.outputs.apk_name }}"
+          SHA="$(cut -d' ' -f1 "dist/$NAME.sha256")"
+          cat > release-notes.md <<EOF
+          ## Instalación
+
+          1. Descarga \`$NAME\` en tu teléfono.
+          2. Ábrelo y permite "Instalar apps desconocidas" para tu navegador o gestor de archivos si Android lo solicita.
+          3. Si Kora ya está instalada desde un Release anterior, se actualizará conservando tus datos.
+
+          ## Verificación
+
+          - SHA-256 del APK: \`$SHA\`
+          - Certificado de firma (SHA-256): \`${{ needs.build.outputs.cert_sha256 }}\`
+
+          Kora es una herramienta de seguimiento, no un dispositivo de diagnóstico.
+          EOF
+
+      - name: Crear Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Kora v${{ needs.build.outputs.version }}
+          body_path: release-notes.md
+          generate_release_notes: true
+          files: |
+            dist/${{ needs.build.outputs.apk_name }}
+            dist/${{ needs.build.outputs.apk_name }}.sha256
+          fail_on_unmatched_files: true

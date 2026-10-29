@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Rutas que FileProvider puede exponer. Solo la carpeta privada de
+    actualizaciones (filesDir/updates/), donde UpdateChecker guarda el APK
+    descargado antes de entregarlo al instalador con FLAG_GRANT_READ_URI_PERMISSION.
+-->
+<paths>
+    <files-path
+        name="kora_updates"
+        path="updates/" />
+</paths>

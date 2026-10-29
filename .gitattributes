@@ -1,0 +1,10 @@
+# Finales de línea LF en el repositorio (se edita en Windows, se compila en Ubuntu).
+* text=auto eol=lf
+
+*.ttf binary
+*.otf binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.jar binary
+*.jks binary

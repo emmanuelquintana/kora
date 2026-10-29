@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema de ventana. enableEdgeToEdge() ajusta barras del sistema y Compose (KoraTheme) dibuja el resto. -->
+    <style name="Theme.Kora" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/kora_paper</item>
+    </style>
+
+    <!-- Splash (androidx.core:core-splashscreen) que cede el paso a Theme.Kora. -->
+    <style name="Theme.Kora.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/kora_paper</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/kora_icon_background</item>
+        <item name="postSplashScreenTheme">@style/Theme.Kora</item>
+    </style>
+</resources>
