@@ -7,14 +7,16 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.window.core.layout.WindowWidthSizeClass
 import androidx.window.layout.FoldingFeature
 import androidx.window.layout.WindowInfoTracker
 import androidx.window.layout.WindowLayoutInfo
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 /** Clase de ancho independiente de la librería, para lógica pura y pruebas. */
 enum class WidthClass { COMPACT, MEDIUM, EXPANDED }
@@ -109,11 +111,10 @@ internal tailrec fun Context.findActivity(): Activity? = when (this) {
 fun rememberKoraPosture(): KoraPosture {
     val context = LocalContext.current
     val activity = remember(context) { context.findActivity() }
-    val layoutInfo by produceState<WindowLayoutInfo?>(initialValue = null, activity) {
-        if (activity != null) {
-            WindowInfoTracker.getOrCreate(activity).windowLayoutInfo(activity).collect { value = it }
-        }
+    val layoutFlow: Flow<WindowLayoutInfo?> = remember(activity) {
+        activity?.let { WindowInfoTracker.getOrCreate(it).windowLayoutInfo(it) } ?: emptyFlow()
     }
+    val layoutInfo by layoutFlow.collectAsState(initial = null)
     val width = currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass.toWidthClass()
     val hinges = layoutInfo?.displayFeatures?.filterIsInstance<FoldingFeature>()?.map { it.toSnapshot() }.orEmpty()
     return remember(width, hinges) { PostureResolver.resolve(width, hinges) }
