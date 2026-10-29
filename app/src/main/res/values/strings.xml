@@ -31,4 +31,28 @@
     <string name="posture_flat">Plana</string>
 
     <string name="today_content_description">Hoy es %1$s</string>
+
+    <!-- Canales de notificación -->
+    <string name="channel_medications_name">Recordatorios de medicamentos</string>
+    <string name="channel_medications_description">Avisos a la hora de cada toma, con las acciones Tomada y Posponer 15 min.</string>
+    <string name="channel_rest_timer_name">Reposo antes de medir</string>
+    <string name="channel_rest_timer_description">Aviso cuando terminan los 5 minutos de reposo previos a medir la presión.</string>
+    <string name="channel_updates_name">Actualizaciones de Kora</string>
+    <string name="channel_updates_description">Progreso de descarga de nuevas versiones.</string>
+
+    <!-- Recordatorio de toma -->
+    <string name="dose_reminder_public_title">Kora</string>
+    <string name="dose_reminder_public_text">Tienes un recordatorio pendiente</string>
+    <string name="dose_reminder_title">Hora de tomar %1$s</string>
+    <string name="dose_reminder_text">%1$s · programada a las %2$s</string>
+    <string name="dose_action_taken">Tomada</string>
+    <string name="dose_action_snooze">Posponer 15 min</string>
+
+    <!-- Temporizador de reposo -->
+    <string name="rest_timer_done_title">Terminó el reposo de 5 minutos</string>
+    <string name="rest_timer_done_text">Cuando estés listo, mide tu presión sentado, con la espalda apoyada y el brazo a la altura del corazón.</string>
+
+    <!-- Actualizador -->
+    <string name="update_download_title">Descargando actualización de Kora</string>
+    <string name="update_download_progress">%1$d %%</string>
 </resources>

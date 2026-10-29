@@ -6,12 +6,12 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Recordatorios de medicamentos (Parte 2). -->
+    <!-- Recordatorios de medicamentos y temporizador de reposo. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <!-- Auto-actualizador: descarga en segundo plano e instalación del APK (Parte 2). -->
+    <!-- Auto-actualizador: descarga en segundo plano e instalación del APK. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
@@ -54,7 +54,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Comparte el APK descargado con el instalador del sistema (Parte 2). -->
+        <!-- Comparte el APK descargado con el instalador del sistema. -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -64,6 +64,38 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Alarma de cada toma (PendingIntent explícito; no exportado). -->
+        <receiver
+            android:name=".core.notifications.MedicationAlarmReceiver"
+            android:exported="false" />
+
+        <!-- Acciones "Tomada" / "Posponer 15 min" de la notificación. -->
+        <receiver
+            android:name=".core.notifications.NotificationActionsReceiver"
+            android:exported="false" />
+
+        <!-- Fin del temporizador de reposo (modo Flex). -->
+        <receiver
+            android:name=".core.notifications.RestTimerReceiver"
+            android:exported="false" />
+
+        <!--
+            Reprogramación tras reinicio, cambio de hora/zona, actualización de la
+            app o cambio del permiso de alarmas exactas. Todas son difusiones
+            protegidas del sistema; el receptor solo vuelve a programar alarmas.
+        -->
+        <receiver
+            android:name=".core.notifications.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
 
         <!-- WorkManager: la descarga de actualizaciones corre como servicio de datos. -->
         <service

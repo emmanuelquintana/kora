@@ -1,0 +1,115 @@
+rules_version = '2';
+
+// Reglas de Cloud Firestore para Kora.
+// - Cada persona solo puede leer y escribir bajo users/{suUid}/.
+// - Se valida el tipo, el rango y el conjunto exacto de campos de cada documento
+//   (los nombres coinciden con data/mapper/FirestoreMappers.kt).
+// - updatedAt debe ser la hora del servidor (FieldValue.serverTimestamp()).
+// - Todo lo que no esté explícitamente permitido se rechaza.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function stampedNow(data) {
+      return data.updatedAt == request.time;
+    }
+
+    function optionalString(data, field, maxLength) {
+      return !(field in data) || data[field] == null
+        || (data[field] is string && data[field].size() <= maxLength);
+    }
+
+    function intIn(value, min, max) {
+      return value is int && value >= min && value <= max;
+    }
+
+    function validGlucose(data) {
+      return data.keys().hasOnly(['valueMgDl', 'context', 'measuredAt', 'note', 'createdAt', 'updatedAt'])
+        && data.keys().hasAll(['valueMgDl', 'context', 'measuredAt', 'createdAt', 'updatedAt'])
+        && intIn(data.valueMgDl, 20, 600)
+        && data.context in ['fasting', 'pre_meal', 'post_meal_2h', 'bedtime']
+        && data.measuredAt is timestamp
+        && data.createdAt is timestamp
+        && optionalString(data, 'note', 500)
+        && stampedNow(data);
+    }
+
+    function validBloodPressure(data) {
+      return data.keys().hasOnly(['systolic', 'diastolic', 'pulse', 'arm', 'measuredAt', 'note', 'createdAt', 'updatedAt'])
+        && data.keys().hasAll(['systolic', 'diastolic', 'arm', 'measuredAt', 'createdAt', 'updatedAt'])
+        && intIn(data.systolic, 60, 260)
+        && intIn(data.diastolic, 30, 160)
+        && data.diastolic < data.systolic
+        && (!('pulse' in data) || data.pulse == null || intIn(data.pulse, 30, 220))
+        && data.arm in ['left', 'right']
+        && data.measuredAt is timestamp
+        && data.createdAt is timestamp
+        && optionalString(data, 'note', 500)
+        && stampedNow(data);
+    }
+
+    function validMedication(data) {
+      return data.keys().hasOnly(['name', 'dose', 'unit', 'times', 'daysOfWeek', 'stockUnits', 'unitsPerDose',
+                                  'lowStockDays', 'active', 'createdAt', 'updatedAt'])
+        && data.keys().hasAll(['name', 'times', 'daysOfWeek', 'stockUnits', 'unitsPerDose', 'active', 'createdAt', 'updatedAt'])
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 60
+        && optionalString(data, 'dose', 20)
+        && optionalString(data, 'unit', 20)
+        && data.times is list && data.times.size() >= 1 && data.times.size() <= 8
+        && data.daysOfWeek is list && data.daysOfWeek.size() >= 1 && data.daysOfWeek.size() <= 7
+        // El stock puede quedar ligeramente negativo por incrementos sin conexión simultáneos.
+        && intIn(data.stockUnits, -1000, 9999)
+        && intIn(data.unitsPerDose, 1, 20)
+        && (!('lowStockDays' in data) || intIn(data.lowStockDays, 0, 60))
+        && data.active is bool
+        && data.createdAt is timestamp
+        && stampedNow(data);
+    }
+
+    function validMedicationLog(data) {
+      return data.keys().hasOnly(['medicationId', 'scheduledDate', 'scheduledTime', 'status', 'recordedAt',
+                                  'snoozedUntil', 'unitsApplied', 'updatedAt'])
+        && data.keys().hasAll(['medicationId', 'scheduledDate', 'scheduledTime', 'status', 'recordedAt', 'unitsApplied', 'updatedAt'])
+        && data.medicationId is string && data.medicationId.size() > 0 && data.medicationId.size() <= 128
+        && data.scheduledDate is string && data.scheduledDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && data.scheduledTime is string && data.scheduledTime.matches('^[0-2][0-9]:[0-5][0-9]$')
+        && data.status in ['taken', 'skipped', 'snoozed']
+        && data.recordedAt is timestamp
+        && (!('snoozedUntil' in data) || data.snoozedUntil == null || data.snoozedUntil is timestamp)
+        && intIn(data.unitsApplied, 0, 20)
+        && stampedNow(data);
+    }
+
+    match /users/{uid} {
+      // No hay documento de perfil: solo subcolecciones.
+      allow read, write: if false;
+
+      match /glucose/{entryId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validGlucose(request.resource.data);
+      }
+
+      match /blood_pressure/{entryId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validBloodPressure(request.resource.data);
+      }
+
+      match /medications/{medicationId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validMedication(request.resource.data);
+      }
+
+      match /medication_logs/{logId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validMedicationLog(request.resource.data);
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

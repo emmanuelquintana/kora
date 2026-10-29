@@ -4,11 +4,13 @@ import android.app.Application
 import android.os.StrictMode
 
 /**
- * Punto de entrada del proceso. En la Parte 2 aquí se crea el contenedor de
- * dependencias (repositorios, AuthManager, AlarmScheduler, UpdateChecker) y se
- * registran los canales de notificación.
+ * Punto de entrada del proceso: crea el contenedor de dependencias, registra
+ * los canales de notificación y arranca la sincronización de alarmas.
  */
 class KoraApplication : Application() {
+
+    lateinit var container: AppContainer
+        private set
 
     override fun onCreate() {
         super.onCreate()
@@ -21,5 +23,7 @@ class KoraApplication : Application() {
                 StrictMode.VmPolicy.Builder().detectLeakedClosableObjects().penaltyLog().build(),
             )
         }
+        container = AppContainer(this)
+        container.start()
     }
 }

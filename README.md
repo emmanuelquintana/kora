@@ -15,9 +15,12 @@ en teléfonos convencionales y tablets.
 | [KORA_DESIGN_SYSTEM.md](KORA_DESIGN_SYSTEM.md) | Dirección visual "Hoja del día", tokens, componentes y movimiento |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Capas, estado, plegables, datos, servicios y matriz de versiones |
 
-**Estado:** Parte 1 de 3. Incluye configuración, arquitectura, CI/CD, tema y una
-pantalla de verificación. Core y datos llegan en la Parte 2, y la UI completa
-en la Parte 3.
+**Estado:** Partes 1 y 2 de 3.
+
+- **Parte 1:** configuración, CI/CD y tema.
+- **Parte 2:** datos, autenticación, alarmas, actualizador y ViewModels.
+- **Parte 3 (pendiente):** la UI completa. Hasta entonces la app instalada
+  muestra la pantalla de verificación de la Parte 1.
 
 ---
 
@@ -187,7 +190,13 @@ la misma identidad y se instalan unos sobre otros conservando los datos.
 3. En **Authentication → Método de acceso**, habilita **Correo/contraseña** y
    **Google**.
 4. Crea **Cloud Firestore** en modo producción, en la región `nam5` o la más
-   cercana. Las reglas se entregan en la Parte 2 (`firestore.rules`).
+   cercana. Después publica las reglas de [firestore.rules](firestore.rules):
+   cópialas en **Firestore → Reglas → Publicar**, o usa Firebase CLI desde
+   Codespaces o Cloud Shell:
+
+```bash
+npx firebase-tools deploy --only firestore:rules --project TU_PROYECTO
+```
 5. Descarga `google-services.json` **después** de añadir las huellas (así
    incluye el cliente OAuth web) y guárdalo como secret:
 

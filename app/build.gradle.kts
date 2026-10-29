@@ -189,4 +189,6 @@ dependencies {
     // Pruebas unitarias (JVM, sin emulador)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    // org.json real para pruebas JVM (el de android.jar es un stub).
+    testImplementation(libs.org.json)
 }

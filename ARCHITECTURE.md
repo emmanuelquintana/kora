@@ -104,9 +104,9 @@ El resultado es `KoraPosture`:
 
 | Postura | Condición |
 |---|---|
-| `Tabletop(hingeTopPx, hingeBottomPx)` | `FoldingFeature` horizontal y `HALF_OPENED` |
-| `Book(hingeBounds)` | `FoldingFeature` vertical y `HALF_OPENED` |
-| `Expanded(separation?)` | Ancho `EXPANDED`, con el hueco de la bisagra si `isSeparating` |
+| `Tabletop(hinge)` | `FoldingFeature` horizontal y `HALF_OPENED` |
+| `Book(hinge)` | `FoldingFeature` vertical y `HALF_OPENED` |
+| `Expanded(hinge?)` | Ancho `EXPANDED`; incluye la bisagra vertical plana si existe, para respetar su posición |
 | `Compact` / `Medium` | El resto |
 
 **Nunca se infiere "plegable" solo por el ancho.** Si el dispositivo no reporta
@@ -161,6 +161,31 @@ conectado. Los ViewModels reciben dependencias mediante
 | Notificaciones | Canal "Recordatorios de medicamentos" (alta importancia) y canal "Actualizaciones". Acciones "Tomada" y "Posponer 15 min" con `PendingIntent.FLAG_IMMUTABLE`. El ID de notificación es estable para no duplicar. |
 | Actualizador | `UpdateChecker` (OkHttp + `org.json`) consulta `releases/latest` y la descarga corre en `UpdateDownloadWorker` (WorkManager, servicio `dataSync`). Guarda en `filesDir/updates/`, verifica el SHA-256 publicado y el certificado de firma con `PackageManager.getPackageArchiveInfo`, e instala con `FileProvider` + `ACTION_VIEW`. |
 
+### Decisiones de implementación (Parte 2)
+
+- **Escrituras sin esperar al servidor.** Con persistencia offline, una `Task`
+  de Firestore no se completa hasta que el servidor confirma, lo que sin
+  conexión podría tardar horas. Los repositorios lanzan la escritura y
+  regresan en cuanto queda aplicada localmente. Los rechazos posteriores
+  (reglas, sesión) llegan por `KoraRepository.writeErrors` y la UI los
+  muestra.
+- **Tomas idempotentes con stock coherente.** `recordDose` usa el ID
+  determinista de la toma y un `WriteBatch`: escribe el registro y
+  `FieldValue.increment(±unidades)` en el medicamento, operación que también
+  funciona sin conexión. Si la toma ya estaba "Tomada", repetir no hace nada;
+  cambiarla a "Omitida" o deshacerla devuelve exactamente lo descontado
+  (`unitsApplied`). Un `Mutex` evita carreras entre toques rápidos.
+- **Registro local de alarmas** (`AlarmRegistry`, SharedPreferences privadas y
+  excluidas de respaldos). Guarda nombre, dosis, horas y días de cada
+  medicamento para reprogramar tras reiniciar sin red ni sesión, y para
+  cancelar las alarmas de medicamentos eliminados. Se borra al cerrar sesión.
+- **Notificaciones privadas** en la pantalla de bloqueo
+  (`VISIBILITY_PRIVATE` + versión pública genérica): el nombre del
+  medicamento no se ve con el teléfono bloqueado.
+- **Actualizador:** el APK solo se declara listo si coinciden el tamaño, el
+  SHA-256 publicado (cuando existe), el `applicationId`, un `versionCode`
+  mayor y el certificado de firma de la app instalada.
+
 ## 8. Matriz de versiones
 
 Verificada contra Google Maven y Maven Central el 2026-10-29. **No se mezclan
@@ -183,6 +208,7 @@ versiones fuera de esta matriz sin revisar la compatibilidad.**
 | credentials / googleid | 1.3.0 / 1.1.1 | |
 | OkHttp | 4.12.0 | |
 | Coroutines | 1.9.0 | |
+| org.json (solo pruebas JVM) | 20240303 | El de `android.jar` es un stub en pruebas unitarias |
 
 **Para actualizar:** primero Gradle y AGP juntos según la tabla oficial de
 compatibilidad; después compileSdk; después el BOM de Compose, revisando el
