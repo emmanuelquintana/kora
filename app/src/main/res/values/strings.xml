@@ -2,35 +2,317 @@
 <resources>
     <string name="app_name">Kora</string>
     <string name="app_tagline">Claridad para cuidar lo importante</string>
+    <string name="disclaimer">Kora es una herramienta de seguimiento, no un dispositivo de diagnóstico. Las clasificaciones son orientativas; los rangos y tratamientos los define tu médico.</string>
 
-    <string name="demo_mode_title">Modo demostración</string>
-    <string name="demo_mode_body">Firebase no está configurado en este build. Los datos que verás serán ficticios y nada se sincroniza.</string>
-    <string name="connected_mode_title">Firebase configurado</string>
-    <string name="connected_mode_body">Este build puede iniciar sesión y sincronizar con Cloud Firestore.</string>
+    <!-- Navegación -->
+    <string name="nav_today">Hoy</string>
+    <string name="nav_history">Historial</string>
+    <string name="nav_medications">Medicinas</string>
+    <string name="nav_profile">Perfil</string>
 
-    <string name="bootstrap_heading">Base lista</string>
-    <string name="bootstrap_body">Esta es la versión inicial de Kora: tema, tipografía y canal de compilación. Los registros, gráficas y recordatorios llegan en las siguientes entregas.</string>
-
-    <string name="build_section_title">Este build</string>
-    <string name="build_version">Versión</string>
-    <string name="build_commit">Commit</string>
-    <string name="build_signing">Firma</string>
-    <string name="build_window">Ventana</string>
-    <string name="build_posture">Postura</string>
-
-    <string name="signing_persistent">Persistente · admite actualizaciones</string>
-    <string name="signing_ephemeral">Temporal · solo para pruebas</string>
-    <string name="signing_unsigned">Sin firma (build local)</string>
-    <string name="signing_ephemeral_warning">Este APK usa una firma temporal. Para instalar otro build tendrás que desinstalarlo primero y se borrarán sus datos locales.</string>
-
-    <string name="window_compact">Compacta (pantalla exterior)</string>
-    <string name="window_medium">Mediana</string>
-    <string name="window_expanded">Expandida (pantalla interior)</string>
-    <string name="posture_tabletop">Semiabierto, bisagra horizontal (Flex)</string>
-    <string name="posture_book">Semiabierto, bisagra vertical</string>
-    <string name="posture_flat">Plana</string>
-
+    <!-- Hoja del día -->
     <string name="today_content_description">Hoy es %1$s</string>
+
+    <!-- Sincronización -->
+    <string name="sync_demo">Demostración</string>
+    <string name="sync_synced">Sincronizado</string>
+    <string name="sync_pending">Guardado en el teléfono</string>
+    <string name="sync_offline">Sin conexión</string>
+    <string name="sync_error">Error al sincronizar</string>
+    <string name="sync_loading">Cargando</string>
+    <string name="demo_banner">Modo demostración: datos ficticios que no se guardan ni se sincronizan.</string>
+
+    <!-- Estado de salud -->
+    <string name="status_ok">En rango</string>
+    <string name="status_caution">Para vigilar</string>
+    <string name="status_alert">Fuera de rango</string>
+    <string name="status_urgent">Requiere atención</string>
+    <string name="status_insufficient">Datos incompletos</string>
+    <string name="status_missing_glucose">Sin lecturas de glucosa en %1$d días</string>
+    <string name="status_missing_pressure">Sin lecturas de presión en %1$d días</string>
+    <string name="status_reason_glucose">Glucosa %1$s mg/dL · %2$s · %3$s</string>
+    <string name="status_reason_pressure">Presión %1$s/%2$s mmHg · %3$s · %4$s</string>
+    <string name="status_explainer">Basado en tu última lectura de cada tipo y en tus rangos configurados.</string>
+
+    <!-- Categorías -->
+    <string name="bp_normal">Normal</string>
+    <string name="bp_elevated">Elevada</string>
+    <string name="bp_stage1">Hipertensión nivel 1</string>
+    <string name="bp_stage2">Hipertensión nivel 2</string>
+    <string name="bp_severe">Muy alta</string>
+    <string name="glucose_very_low">Muy baja</string>
+    <string name="glucose_low">Baja</string>
+    <string name="glucose_in_range">En rango</string>
+    <string name="glucose_high">Alta</string>
+    <string name="glucose_very_high">Muy alta</string>
+
+    <!-- Contextos de glucosa y brazo -->
+    <string name="context_fasting">Ayunas</string>
+    <string name="context_pre_meal">Pre-comida</string>
+    <string name="context_post_meal">Post-comida 2 h</string>
+    <string name="context_bedtime">Antes de dormir</string>
+    <string name="arm_left">Brazo izquierdo</string>
+    <string name="arm_right">Brazo derecho</string>
+    <string name="arm_left_short">Izquierdo</string>
+    <string name="arm_right_short">Derecho</string>
+
+    <!-- Avisos clínicos -->
+    <string name="advice_severe_title">Lectura muy alta</string>
+    <string name="advice_severe_body">Descansa 5 minutos sentado y vuelve a medir. Si sigue igual de alta, o si tienes dolor de pecho, falta de aire, dolor de espalda, debilidad o entumecimiento, cambios en la visión o dificultad para hablar, busca atención médica urgente (911).</string>
+    <string name="advice_stage2_body">Confirma con otra medición en otro momento del día y coméntalo con tu médico.</string>
+    <string name="advice_very_low_title">Glucosa muy baja</string>
+    <string name="advice_very_low_body">Sigue el plan para hipoglucemia que te indicó tu médico. Si no puedes tragar, te sientes confundido o no mejoras, pide ayuda o llama al 911.</string>
+    <string name="advice_remeasure">Medir de nuevo</string>
+    <string name="advice_understood">Entendido</string>
+
+    <!-- Secciones del Inicio -->
+    <string name="section_latest">Últimas lecturas</string>
+    <string name="section_doses_today">Tomas de hoy</string>
+    <string name="section_stock">Existencias</string>
+    <string name="doses_pending">%1$d pendientes</string>
+    <string name="doses_all_done">Todas registradas</string>
+    <string name="glucose">Glucosa</string>
+    <string name="blood_pressure">Presión arterial</string>
+    <string name="pressure_short">Presión</string>
+    <string name="unit_mg_dl">mg/dL</string>
+    <string name="unit_mmhg">mmHg</string>
+    <string name="unit_bpm">lpm</string>
+    <string name="no_glucose_yet">Aún no hay lecturas de glucosa</string>
+    <string name="no_pressure_yet">Aún no hay lecturas de presión</string>
+    <string name="pulse_value">Pulso %1$s lpm</string>
+    <string name="measured_today_at">hoy %1$s</string>
+    <string name="measured_on">%1$s, %2$s</string>
+
+    <!-- Registro rápido -->
+    <string name="quick_glucose">Registrar glucosa</string>
+    <string name="quick_pressure">Registrar presión</string>
+    <string name="entry_glucose_title">Glucosa</string>
+    <string name="entry_pressure_title">Presión arterial</string>
+    <string name="entry_edit_glucose_title">Editar glucosa</string>
+    <string name="entry_edit_pressure_title">Editar presión</string>
+    <string name="field_value">Valor</string>
+    <string name="field_systolic">Sistólica</string>
+    <string name="field_diastolic">Diastólica</string>
+    <string name="field_pulse_optional">Pulso (opcional)</string>
+    <string name="field_context">Momento</string>
+    <string name="field_arm">Brazo</string>
+    <string name="field_note">Nota (opcional)</string>
+    <string name="field_time">Hora de la medición</string>
+    <string name="time_now">Ahora</string>
+    <string name="time_change">Cambiar hora</string>
+    <string name="save">Guardar</string>
+    <string name="saving">Guardando…</string>
+    <string name="cancel">Cancelar</string>
+    <string name="delete">Eliminar</string>
+    <string name="edit">Editar</string>
+    <string name="undo">Deshacer</string>
+    <string name="accept">Aceptar</string>
+
+    <!-- Errores de campos -->
+    <string name="error_required">Escribe un valor</string>
+    <string name="error_not_number">Solo números enteros</string>
+    <string name="error_range">Entre %1$d y %2$d</string>
+    <string name="error_diastolic_not_below">Debe ser menor que la sistólica</string>
+    <string name="error_future">La hora no puede estar en el futuro</string>
+    <string name="error_too_long">Máximo %1$d caracteres</string>
+    <string name="error_duplicate_time">Hay horarios repetidos</string>
+    <string name="error_low_not_below_high">El límite bajo debe ser menor que el alto</string>
+
+    <!-- Errores generales -->
+    <string name="error_network">Sin conexión. Lo guardado se sincronizará al reconectar.</string>
+    <string name="error_permission">No tienes permiso para esta acción.</string>
+    <string name="error_session">Tu sesión expiró. Vuelve a iniciar sesión.</string>
+    <string name="error_not_found">El registro ya no existe.</string>
+    <string name="error_validation">El servidor rechazó los datos. Revisa los valores.</string>
+    <string name="error_not_configured">Esta función requiere configurar Firebase.</string>
+    <string name="error_unknown">Algo salió mal. Intenta de nuevo.</string>
+
+    <!-- Eventos -->
+    <string name="event_glucose_saved">Glucosa guardada</string>
+    <string name="event_pressure_saved">Presión guardada</string>
+    <string name="event_reading_deleted">Lectura eliminada</string>
+    <string name="event_medication_deleted">%1$s eliminado</string>
+    <string name="event_dose_taken">%1$s: tomada</string>
+    <string name="event_dose_skipped">%1$s: omitida</string>
+    <string name="event_dose_snoozed">%1$s: pospuesta 15 min</string>
+    <string name="event_dose_undone">Registro deshecho</string>
+    <string name="event_medication_saved">Medicamento guardado</string>
+
+    <!-- Tomas -->
+    <string name="dose_state_upcoming">Pendiente</string>
+    <string name="dose_state_due">Toca ahora</string>
+    <string name="dose_state_taken">Tomada</string>
+    <string name="dose_state_skipped">Omitida</string>
+    <string name="dose_state_snoozed">Pospuesta</string>
+    <string name="dose_mark_taken">Marcar %1$s de las %2$s como tomada</string>
+    <string name="dose_undo_taken">Deshacer toma de %1$s de las %2$s</string>
+    <string name="dose_more_actions">Más acciones para %1$s</string>
+    <string name="dose_skip">Omitir esta toma</string>
+    <string name="dose_snooze">Posponer 15 min</string>
+    <string name="no_doses_today">No hay tomas programadas hoy</string>
+
+    <!-- Existencias -->
+    <plurals name="units_left">
+        <item quantity="one">Queda %d unidad</item>
+        <item quantity="many">Quedan %d unidades</item>
+        <item quantity="other">Quedan %d unidades</item>
+    </plurals>
+    <plurals name="days_left">
+        <item quantity="one">alcanza para %d día</item>
+        <item quantity="many">alcanza para %d días</item>
+        <item quantity="other">alcanza para %d días</item>
+    </plurals>
+    <string name="stock_low">Por agotarse</string>
+    <string name="stock_out">Sin existencias</string>
+
+    <!-- Historial y gráficas -->
+    <string name="period_days">%1$d días</string>
+    <string name="chart_glucose_title">Glucosa</string>
+    <string name="chart_pressure_title">Presión arterial</string>
+    <string name="chart_pulse_title">Pulso (lpm)</string>
+    <string name="chart_reference_band">Tu rango %1$d–%2$d</string>
+    <string name="chart_empty">Sin lecturas en este periodo</string>
+    <string name="chart_summary_glucose">Glucosa, últimos %1$d días: %2$d lecturas, mínima %3$d, máxima %4$d, %5$d fuera de tu rango.</string>
+    <string name="chart_summary_pressure">Presión, últimos %1$d días: %2$d lecturas, sistólica entre %3$d y %4$d, diastólica entre %5$d y %6$d.</string>
+    <string name="chart_selected_glucose">%1$s mg/dL · %2$s · %3$s</string>
+    <string name="chart_selected_pressure">%1$s/%2$s mmHg · %3$s</string>
+    <string name="chart_show_values">Ver valores</string>
+    <string name="chart_hide_values">Ocultar valores</string>
+    <string name="legend_systolic">Sistólica</string>
+    <string name="legend_diastolic">Diastólica</string>
+    <string name="trend_title">Lectura de tendencias</string>
+    <string name="trend_glucose_in_range">%1$d %% de tus lecturas de glucosa están dentro de tu rango (%2$d de %3$d).</string>
+    <string name="trend_glucose_average">Promedio %1$d mg/dL; en ayunas %2$s.</string>
+    <string name="trend_pressure_average">Promedio de presión %1$d/%2$d mmHg en %3$d lecturas.</string>
+    <string name="trend_vs_previous_up">%1$d mmHg más que el periodo anterior.</string>
+    <string name="trend_vs_previous_down">%1$d mmHg menos que el periodo anterior.</string>
+    <string name="trend_vs_previous_same">Similar al periodo anterior.</string>
+    <string name="trend_not_enough">Se necesitan al menos 3 lecturas en el periodo para describir una tendencia.</string>
+    <string name="trend_disclaimer">Descripción de tus datos, no una interpretación médica.</string>
+    <string name="no_data_dash">—</string>
+    <string name="history_empty">Todavía no hay lecturas. Registra la primera desde Hoy.</string>
+    <string name="reading_actions_title">Lectura del %1$s</string>
+
+    <!-- Medicamentos -->
+    <string name="medications_title">Medicamentos</string>
+    <string name="medication_add">Agregar medicamento</string>
+    <string name="medication_edit_title">Editar medicamento</string>
+    <string name="medication_new_title">Nuevo medicamento</string>
+    <string name="medication_name">Nombre</string>
+    <string name="medication_dose">Dosis</string>
+    <string name="medication_unit">Unidad</string>
+    <string name="medication_times">Horarios</string>
+    <string name="medication_add_time">Agregar horario</string>
+    <string name="medication_remove_time">Quitar horario de las %1$s</string>
+    <string name="medication_days">Días</string>
+    <string name="medication_stock">Existencias (unidades)</string>
+    <string name="medication_units_per_dose">Unidades por toma</string>
+    <string name="medication_low_stock_days">Avisar cuando alcance para (días)</string>
+    <string name="medication_active">Recordatorios activos</string>
+    <string name="medication_add_stock">+30 unidades</string>
+    <string name="medication_schedule_daily">Diario · %1$s</string>
+    <string name="medication_schedule_days">%1$s · %2$s</string>
+    <string name="medication_paused">Recordatorios en pausa</string>
+    <string name="medication_adherence">Últimos 7 días: %1$d de %2$d tomas registradas</string>
+    <string name="medications_empty">Agrega tus medicamentos para recibir recordatorios y llevar el control de existencias.</string>
+    <string name="confirm_delete_medication">¿Eliminar %1$s? Se cancelarán sus recordatorios; el historial de tomas se conserva.</string>
+    <string name="medication_no_dosing_advice">Kora registra lo que te indicó tu médico; no sugiere dosis ni cambios de tratamiento.</string>
+
+    <!-- Flex -->
+    <string name="flex_rest_title">Reposo previo</string>
+    <string name="flex_rest_start">Iniciar reposo de 5 min</string>
+    <string name="flex_rest_cancel">Detener</string>
+    <string name="flex_rest_running">Permanece sentado y en silencio</string>
+    <string name="flex_rest_done">Reposo completado. Mide cuando estés listo.</string>
+    <string name="flex_prep">Espalda apoyada, pies en el piso, brazo a la altura del corazón y sin hablar.</string>
+    <string name="flex_last_reading">Última lectura</string>
+    <string name="flex_save">Guardar medición</string>
+
+    <!-- Perfil -->
+    <string name="profile_title">Perfil</string>
+    <string name="profile_account">Cuenta</string>
+    <string name="profile_demo_account">Modo demostración (sin cuenta)</string>
+    <string name="profile_sign_out">Cerrar sesión</string>
+    <string name="profile_sign_out_confirm">Al cerrar sesión se borran de este teléfono los datos guardados y se cancelan los recordatorios. Tus datos siguen en tu cuenta.</string>
+    <string name="profile_ranges">Rango de glucosa</string>
+    <string name="profile_ranges_body">Defínelo con tu médico. 70–180 mg/dL es solo el valor inicial, no un objetivo universal.</string>
+    <string name="profile_range_low">Bajo (mg/dL)</string>
+    <string name="profile_range_high">Alto (mg/dL)</string>
+    <string name="profile_ranges_saved">Rango actualizado</string>
+    <string name="profile_reminders">Recordatorios</string>
+    <string name="profile_notifications_on">Notificaciones activadas</string>
+    <string name="profile_notifications_off">Notificaciones desactivadas: no verás recordatorios.</string>
+    <string name="profile_notifications_enable">Activar notificaciones</string>
+    <string name="profile_exact_on">Alarmas puntuales permitidas</string>
+    <string name="profile_exact_off">Sin alarmas puntuales: Android puede retrasar los recordatorios varios minutos.</string>
+    <string name="profile_exact_enable">Permitir alarmas puntuales</string>
+    <string name="profile_updates">Actualizaciones</string>
+    <string name="profile_build">Este build</string>
+    <string name="profile_version">Versión %1$s</string>
+    <string name="signing_persistent">Firma persistente · admite actualizaciones</string>
+    <string name="signing_ephemeral">Firma temporal · solo para pruebas</string>
+    <string name="signing_unsigned">Sin firma (build local)</string>
+    <string name="signing_ephemeral_warning">Este APK usa una firma temporal: no podrá actualizarse sobre sí mismo. Para instalar otra versión tendrás que desinstalarlo primero.</string>
+
+    <!-- Actualizador -->
+    <string name="update_check">Buscar actualizaciones</string>
+    <string name="update_checking">Buscando…</string>
+    <string name="update_up_to_date">Tienes la versión más reciente</string>
+    <string name="update_available">Versión %1$s disponible</string>
+    <string name="update_download">Descargar</string>
+    <string name="update_downloading">Descargando %1$s</string>
+    <string name="update_cancel">Cancelar descarga</string>
+    <string name="update_ready">Versión %1$s lista para instalar</string>
+    <string name="update_install">Instalar</string>
+    <string name="update_verified">Verificada: firma y SHA-256 coinciden</string>
+    <string name="update_signature_only">Verificada: firma coincide (el Release no publicó SHA-256)</string>
+    <string name="update_notes">Notas de la versión</string>
+    <string name="update_permission_needed">Android pide permitir que Kora instale actualizaciones. Actívalo y vuelve a tocar Instalar.</string>
+    <string name="update_fail_offline">Sin conexión. Intenta más tarde.</string>
+    <string name="update_fail_rate_limited">GitHub limitó las consultas. Intenta en un rato.</string>
+    <string name="update_fail_no_releases">Aún no hay versiones publicadas.</string>
+    <string name="update_fail_no_apk">La versión publicada no incluye un APK.</string>
+    <string name="update_fail_invalid_version">La versión publicada no tiene un número válido.</string>
+    <string name="update_fail_incomplete">La descarga quedó incompleta.</string>
+    <string name="update_fail_checksum">El archivo no coincide con el publicado. No se instalará.</string>
+    <string name="update_fail_not_apk">El archivo descargado no es una actualización de Kora.</string>
+    <string name="update_fail_not_newer">El archivo no es más nuevo que la versión instalada.</string>
+    <string name="update_fail_signature">La firma no coincide con la de esta instalación. Por seguridad no se instalará.</string>
+    <string name="update_fail_file">El archivo ya no está disponible. Descárgalo de nuevo.</string>
+    <string name="update_fail_generic">No se pudo completar. Intenta de nuevo.</string>
+    <string name="retry">Reintentar</string>
+
+    <!-- Autenticación -->
+    <string name="auth_title">Inicia sesión para sincronizar tus datos</string>
+    <string name="auth_register_title">Crea tu cuenta</string>
+    <string name="auth_reset_title">Recupera tu contraseña</string>
+    <string name="auth_email">Correo electrónico</string>
+    <string name="auth_password">Contraseña</string>
+    <string name="auth_password_hint">Mínimo 8 caracteres</string>
+    <string name="auth_name">Nombre (opcional)</string>
+    <string name="auth_sign_in">Iniciar sesión</string>
+    <string name="auth_register">Crear cuenta</string>
+    <string name="auth_send_reset">Enviar instrucciones</string>
+    <string name="auth_google">Continuar con Google</string>
+    <string name="auth_to_register">¿No tienes cuenta? Crear una</string>
+    <string name="auth_to_sign_in">¿Ya tienes cuenta? Inicia sesión</string>
+    <string name="auth_to_reset">Olvidé mi contraseña</string>
+    <string name="auth_reset_sent">Si existe una cuenta con ese correo, recibirás instrucciones en unos minutos.</string>
+    <string name="auth_session_expired">Tu sesión expiró. Vuelve a iniciar sesión para seguir sincronizando.</string>
+    <string name="auth_show_password">Mostrar contraseña</string>
+    <string name="auth_hide_password">Ocultar contraseña</string>
+    <string name="auth_error_invalid_credentials">Correo o contraseña incorrectos.</string>
+    <string name="auth_error_invalid_email">Ese correo no parece válido.</string>
+    <string name="auth_error_email_in_use">Ya existe una cuenta con ese correo.</string>
+    <string name="auth_error_weak_password">Usa una contraseña más segura (mínimo 8 caracteres).</string>
+    <string name="auth_error_network">Sin conexión. Revisa tu red e intenta de nuevo.</string>
+    <string name="auth_error_too_many">Demasiados intentos. Espera unos minutos.</string>
+    <string name="auth_error_no_google">No hay cuentas de Google en este teléfono.</string>
+    <string name="auth_error_google_not_configured">El inicio con Google aún no está configurado en este build.</string>
+    <string name="auth_error_generic">No se pudo iniciar sesión. Intenta de nuevo.</string>
+
+    <!-- Carga -->
+    <string name="loading">Cargando tus datos</string>
 
     <!-- Canales de notificación -->
     <string name="channel_medications_name">Recordatorios de medicamentos</string>
@@ -52,7 +334,7 @@
     <string name="rest_timer_done_title">Terminó el reposo de 5 minutos</string>
     <string name="rest_timer_done_text">Cuando estés listo, mide tu presión sentado, con la espalda apoyada y el brazo a la altura del corazón.</string>
 
-    <!-- Actualizador -->
+    <!-- Actualizador (notificación) -->
     <string name="update_download_title">Descargando actualización de Kora</string>
     <string name="update_download_progress">%1$d %%</string>
 </resources>

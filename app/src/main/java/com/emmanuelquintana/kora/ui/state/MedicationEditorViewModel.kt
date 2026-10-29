@@ -37,11 +37,14 @@ data class MedicationDraft(
 
 data class MedicationEditorUiState(
     val draft: MedicationDraft = MedicationDraft(),
-    val isEditing: Boolean = false,
+    /** ID del medicamento en edición; null al crear uno nuevo. */
+    val editingId: String? = null,
     val validation: ValidationResult = ValidationResult(emptyMap()),
     val showErrors: Boolean = false,
     val isSaving: Boolean = false,
-)
+) {
+    val isEditing: Boolean get() = editingId != null
+}
 
 /** Alta y edición de medicamentos. El borrador sobrevive a cambios de postura. */
 class MedicationEditorViewModel(
@@ -87,7 +90,7 @@ class MedicationEditorViewModel(
         )
         MedicationEditorUiState(
             draft = draft,
-            isEditing = handle.get<String>(KEY_EDITING_ID) != null,
+            editingId = handle.get<String>(KEY_EDITING_ID),
             validation = MeasurementValidator.validateMedication(
                 draft.name, draft.dose, draft.unit, draft.times, draft.days,
                 draft.rawStock, draft.rawUnitsPerDose, draft.rawLowStockDays,

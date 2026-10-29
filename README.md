@@ -15,12 +15,15 @@ en teléfonos convencionales y tablets.
 | [KORA_DESIGN_SYSTEM.md](KORA_DESIGN_SYSTEM.md) | Dirección visual "Hoja del día", tokens, componentes y movimiento |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Capas, estado, plegables, datos, servicios y matriz de versiones |
 
-**Estado:** Partes 1 y 2 de 3.
+**Estado:** Partes 1, 2 y 3 entregadas.
 
 - **Parte 1:** configuración, CI/CD y tema.
 - **Parte 2:** datos, autenticación, alarmas, actualizador y ViewModels.
-- **Parte 3 (pendiente):** la UI completa. Hasta entonces la app instalada
-  muestra la pantalla de verificación de la Parte 1.
+- **Parte 3:** UI nativa adaptativa.
+  - Compacta: pantalla exterior con NavigationBar.
+  - Flex: estación de medición con la bisagra horizontal semiabierta.
+  - Expandida: pantalla interior con NavigationRail y dos paneles.
+  - Gráficas en Canvas, registro rápido, historial, medicamentos, perfil y actualizaciones.
 
 ---
 

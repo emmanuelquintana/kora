@@ -36,15 +36,20 @@ com.emmanuelquintana.kora
     ├── compact/                CompactScreen (pantalla exterior)
     ├── flex/                   FlexModeScreen (mesa)
     ├── expanded/               ExpandedDualPaneScreen (interior)
-    ├── charts/                 GlucoseChart, BloodPressureChart (Canvas)
-    ├── screens/                Login, Registro, Historial, Medicamentos, Perfil, Actualizaciones
-    └── bootstrap/              TEMPORAL (Parte 1): se elimina en la Parte 3
+    ├── charts/                 GlucoseChart, BloodPressureChart (Canvas) + modelos y tendencias
+    ├── screens/                Hoy, Historial, Medicamentos, Perfil/Actualizaciones, Auth, formularios
+    └── state/                  ViewModels (sesión, glucosa, presión, medicamentos, auth) y su fábrica
 ```
 
 **Cambios respecto a la propuesta inicial:**
 
-- `ui/bootstrap/` existe solo para que la Parte 1 compile e instale algo
-  verificable. Se elimina en la Parte 3.
+- **Sin Navigation Compose.** Kora tiene cuatro secciones de primer nivel que
+  se muestran a la vez en layouts distintos (barra, riel, dos paneles, Flex).
+  Un `NavHost` impone una pila por layout. En su lugar, `KoraShellState`
+  (sección, pestaña del historial, periodo y `LazyListState`) vive por encima
+  del cambio de postura y se guarda con `rememberSaveable`. Atrás desde otra
+  sección regresa a Hoy (`BackHandler`). Las hojas de registro son
+  `ModalBottomSheet` cuyo borrador vive en su ViewModel.
 - `core/designsystem/` agrupa tokens (`KoraTones`, `KoraColor`, `KoraType`,
   `KoraLayout`, `KoraMotion`) y `KoraTheme`. Los tonos son `Long` ARGB puros
   para poder probar el contraste en la JVM sin Robolectric.
@@ -202,7 +207,7 @@ versiones fuera de esta matriz sin revisar la compatibilidad.**
 | Material3 Adaptive | 1.0.0 | Sin `currentWindowAdaptiveInfoV2` |
 | androidx.window | 1.3.0 | |
 | core-ktx | 1.15.0 | Requiere compileSdk 35 |
-| activity-compose / lifecycle / navigation | 1.9.3 / 2.8.7 / 2.8.5 | |
+| activity-compose / lifecycle | 1.9.3 / 2.8.7 | |
 | work-runtime-ktx | 2.10.0 | |
 | Firebase BOM | 33.7.0 | auth + firestore (KTX integrado) |
 | credentials / googleid | 1.3.0 / 1.1.1 | |
