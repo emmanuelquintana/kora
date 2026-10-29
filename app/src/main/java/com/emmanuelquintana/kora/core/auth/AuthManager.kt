@@ -81,7 +81,7 @@ class AuthManager(
 
     val state: StateFlow<AuthState> = run {
         val source = if (auth == null) {
-            flowOf(AuthState.Unavailable)
+            flowOf<AuthState>(AuthState.Unavailable)
         } else {
             callbackFlow {
                 val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->

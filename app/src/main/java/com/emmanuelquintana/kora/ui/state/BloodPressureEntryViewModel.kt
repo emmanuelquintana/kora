@@ -114,9 +114,9 @@ class BloodPressureEntryViewModel(
     val restTimer: StateFlow<RestTimerState> = handle.getStateFlow(KEY_REST_ENDS_AT, NO_TIME)
         .flatMapLatest { endsAt ->
             if (endsAt == NO_TIME) {
-                flowOf(RestTimerState.Idle)
+                flowOf<RestTimerState>(RestTimerState.Idle)
             } else {
-                flow {
+                flow<RestTimerState> {
                     while (true) {
                         val remaining = endsAt - elapsedRealtime()
                         if (remaining <= 0) {
