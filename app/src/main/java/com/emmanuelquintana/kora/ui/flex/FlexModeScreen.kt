@@ -6,7 +6,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -81,7 +80,7 @@ fun FlexModeScreen(
     val hingeTop: Dp = with(density) { hinge.bounds.top.toDp() }
     val hingeBottom: Dp = with(density) { hinge.bounds.bottom.toDp() }
 
-    BoxWithConstraints(modifier.fillMaxSize()) {
+    Box(modifier.fillMaxSize()) {
         val topHeight = (hingeTop - HingeClearance).coerceAtLeast(0.dp)
         val bottomStart = hingeBottom + HingeClearance
         Column(Modifier.fillMaxSize()) {
